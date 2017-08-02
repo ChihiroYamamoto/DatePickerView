@@ -20,19 +20,14 @@ open class DatePickerView: UITextField {
     @IBInspectable open var normalBackgroundImage: UIImage? = nil
     @IBInspectable open var highlightBackgroundImage: UIImage? = nil
     
+    public var source: DatePickerViewSource?
+    
     public var beginEditing: (() -> Void)?
-    public var endEditing: ((Date) -> Void)?
+    public var endEditing: ((Date?) -> Void)?
     
     fileprivate var datePicker: UIDatePicker!
     fileprivate var toolbar: Toolbar!
 
-    public var source: DatePickerViewSource? {
-        didSet {
-            setupDatePicker()
-            updateTitle()
-        }
-    }
-    
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -41,29 +36,23 @@ open class DatePickerView: UITextField {
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
-}
-
-// MARK: - Public
-extension DatePickerView {
-    
-    public var date: Date {
-        get {
-            return datePicker.date
-        }
-        set {
-            datePicker.date = date
-            source?.date = date
-        }
-    }
-}
-
-// MARK: - Override UITextField
-extension DatePickerView {
     
     open override func awakeFromNib() {
         super.awakeFromNib()
         setupView()
     }
+}
+
+// MARK: - Public
+extension DatePickerView {
+    
+    open func reloadData() {
+        reloadDatePicker()
+    }
+}
+
+// MARK: - Override UITextField
+extension DatePickerView {
     
     open override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
         // 長押しで表示されるメニューを非表示
@@ -127,15 +116,15 @@ extension DatePickerView {
     ///
     /// - Parameter sender: TextField
     @objc fileprivate func editingDidEnd(_ sender: Any) {
-        endEditing?(date)
+        endEditing?(source?.date)
         setStyle(false)
     }
     
     /// DatePickerの値変更イベントをハンドル
     ///
     /// - Parameter sender: DatePicker
-    @objc fileprivate func valueChanged(_ sender: Any) {
-        source?.updateDate(date)
+    @objc fileprivate func valueChanged(_ sender: UIDatePicker) {
+        source?.updateDate(sender.date)
         updateTitle()
     }
 }
@@ -166,15 +155,17 @@ extension DatePickerView {
         addTarget(self, action: #selector(editingDidEnd(_:)), for: .editingDidEnd)
     }
     
-    fileprivate func setupDatePicker() {
+    fileprivate func reloadDatePicker() {
         guard let source = source else { return }
         
         datePicker.datePickerMode = source.mode
         datePicker.locale = source.locale
-        datePicker.date = source.date
+        datePicker.date = source.date ?? Date()
         datePicker.minuteInterval = source.minuteInterval
         datePicker.minimumDate = source.minimumDate
         datePicker.maximumDate = source.maximumDate
+        
+        updateTitle()
     }
     
     fileprivate func setStyle(_ isEditing: Bool) {
@@ -198,7 +189,17 @@ extension DatePickerView {
     }
     
     fileprivate func updateTitle() {
-        text = source?.titleFor?(date)
+        guard let date = source?.date else {
+            text = nil
+            attributedText = nil
+            return
+        }
+        
+        if let title = source?.titleFor?(date) {
+            text = title
+        } else if let attributedTitle = source?.attributedTitleFor?(date) {
+            attributedText = attributedTitle
+        }
     }
     
     fileprivate func textFieldRect(forBounds bounds: CGRect) -> CGRect {

@@ -10,11 +10,14 @@ import UIKit
 import DatePickerView
 
 class ViewController: UIViewController {
-    @IBOutlet weak var datePickerView: DatePickerView!
+    @IBOutlet weak var datePickerView: DatePickerView! {
+        didSet {
+            datePickerView.delegate = self
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
         datePickerView.source = DatePickerViewSource { (source) in
             source.titleFor = { (date) in
@@ -28,16 +31,18 @@ class ViewController: UIViewController {
                 print(source.titleFor?(date) ?? "")
             }
         }
-        datePickerView.endEditing = { [weak self] (date) in
-            print(self?.datePickerView.source?.titleFor?(date) ?? "")
+        datePickerView.endEditing = { (date) in
+            // Returns the date at the end of editing.
         }
+        datePickerView.reloadData()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-
 }
 
+extension ViewController: UITextFieldDelegate {
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        datePickerView.source?.date = nil
+        datePickerView.reloadData()
+        return true
+    }
+}

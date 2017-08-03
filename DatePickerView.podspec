@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = "DatePickerView"
-  s.version = "1.1.1"
+  s.version = "1.1.2"
   s.summary = "It is a library that handles UIDatePicker easily."
   s.homepage = "https://github.com/tomoponzoo/DatePickerView"
   s.license = "MIT"

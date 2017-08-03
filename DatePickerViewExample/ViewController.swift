@@ -10,16 +10,13 @@ import UIKit
 import DatePickerView
 
 class ViewController: UIViewController {
-    @IBOutlet weak var datePickerView: DatePickerView! {
-        didSet {
-            datePickerView.delegate = self
-        }
-    }
-
+    @IBOutlet weak var datePickerView: DatePickerView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         datePickerView.source = DatePickerViewSource { (source) in
+            source.date = Date()
             source.titleFor = { (date) in
                 let formatter = DateFormatter()
                 formatter.dateFormat = "yyyy/M/d"
@@ -35,14 +32,5 @@ class ViewController: UIViewController {
             // Returns the date at the end of editing.
         }
         datePickerView.reloadData()
-    }
-}
-
-extension ViewController: UITextFieldDelegate {
-    
-    func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        datePickerView.source?.date = nil
-        datePickerView.reloadData()
-        return true
     }
 }

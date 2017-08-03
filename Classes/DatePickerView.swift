@@ -131,6 +131,14 @@ extension DatePickerView {
         setStyle(false)
     }
     
+    /// TextFieldの編集イベントをハンドル
+    /// 現状クリアボタンでテキストをクリアした時のみ呼び出される
+    ///
+    /// - Parameter sender: TextField
+    @objc fileprivate func editingChanged(_ sender: Any) {
+        source?.date = nil
+    }
+    
     /// DatePickerの値変更イベントをハンドル
     ///
     /// - Parameter sender: DatePicker
@@ -164,6 +172,7 @@ extension DatePickerView {
         // TextFieldの編集開始・終了を監視
         addTarget(self, action: #selector(editingDidBegin(_:)), for: .editingDidBegin)
         addTarget(self, action: #selector(editingDidEnd(_:)), for: .editingDidEnd)
+        addTarget(self, action: #selector(editingChanged(_:)), for: .editingChanged)
     }
     
     fileprivate func reloadDatePicker() {

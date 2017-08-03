@@ -72,6 +72,17 @@ extension DatePickerView {
         return textFieldRect(forBounds: bounds)
     }
     
+    open override func clearButtonRect(forBounds bounds: CGRect) -> CGRect {
+        let size = CGSize(width: 19.0, height: 19.0)
+        let y = bounds.height / 2.0 - size.height / 2.0
+        return CGRect(
+            x: bounds.maxX - right - size.width,
+            y: y < 0 ? 0 : y,
+            width: size.width,
+            height: size.height
+        )
+    }
+    
     open override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
         guard let leftViewBounds = leftView?.bounds else {
             return .zero

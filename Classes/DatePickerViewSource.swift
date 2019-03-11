@@ -9,7 +9,7 @@
 import Foundation
 
 open class DatePickerViewSource {
-    open var mode: UIDatePickerMode = .date
+    open var mode: UIDatePicker.Mode = .date
     open var locale: Locale? = Locale.current
     open var minuteInterval: Int = 1
     open var date: Date?
